@@ -1,2 +1,4 @@
 # AlphaGoZero
-Notes From the Paper "Alpha Go Zero"
+
+## Paper Note:
+[PAPER-NOTE.md](PAPER-NOTE.md) or read [hackmd version](https://hackmd.io/GwIwJmAcCsBm0FpgHYwAYEBYTMgghgMbR4CMAzMNGLGtMPspkA==)
