@@ -1,2 +1,2 @@
 # AlphaGoZero
-Notes From the Paper "Alpha Go Zero"
+Notes From the Paper "Alpha Go Zero".
