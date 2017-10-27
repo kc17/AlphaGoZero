@@ -51,14 +51,14 @@ $U_{(s, a)} = c_{puct} P_{(s, a)} \frac{\sqrt{\sum_b N_{(s, b)}} }{1 + N_{(s, a)
 這裡N為這邊之前被選過幾次，及為走訪次數。走越多的邊信賴上線就越小。我們可以把U想成是一個各邊有的加分條件，讓比較沒走訪過得邊有加分條件，這樣比較容易被選到。
     * **用類神經做評估**: 走到新的節點 $s_L$ 後就要拿給類神經網路做評估。類神經網路回傳的是這狀態的各個動作的動作機率以及這狀態 $\mathbf{p}$ 的價值估計$v$。
         * **邊值初始化（樹的擴充）**: 用$\mathbf{p}$初始化 $s_L$ 所有的邊
-            * For all actions $a$ possible, initialize at edge ($s_L, a$) the values, N = 0, W, Q, and P 
+            * 假設 $A$ 為動作集合，為所有 $a\in A$ 製造一樹邊 ($s_L, a$) 並且初始化統計值 N, W, Q 和 P
                 * N=0: 走訪次數
-                * W=0: total state-action value in sub-tree
-                * Q=0: mean state-action value in sub-tree
+                * W=0: 此樹邊指向的子樹裡的價值合
+                * Q=0: W 除 N，子樹的平均價值 
                 * P=$p_a$ + [$\mathrm{Dir}$ if $s_L$ is root]: stored *prior probability* of taking action $a$ at state $s_L$
                     * add Dirichlet loss to root node to encourage exploration
-        * **更新樹邊的統計（反向傳播）**: 
-            * 用$v$更新根節點到$s_L$路徑各邊 ($s_t$, $a_t$) 的統計值 
+        * **回祖先樹邊更新統計（反向傳播）**: 
+            * 用$v$更新根節點到$s_L$路徑中各邊 ($s_t$, $a_t$) 的統計值 
                 * $W_{(s_t, a_t)} = W_{(s_t, a_t)} + v$
                 * $N_{(s_t, a_t)} = N_{(s_t, a_t)} + 1$
                 * $Q_{(s_t, a_t)} = \frac{W_{(s_t, a_t})}{N_({s_t, a_t})}$
