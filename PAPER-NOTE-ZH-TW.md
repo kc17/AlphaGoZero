@@ -91,6 +91,13 @@ $U_{(s, a)} = c_{puct} P_{(s, a)} \frac{\sqrt{\sum_b N_{(s, b)}} }{1 + N_{(s, a)
 For single example from time-step $t$, $(s_t , \pi_t , z_t )$, $\mathcal{L} = (z_t-v)^2 + (-\mathbf{\pi_t}^{\intercal}\mathrm{log}\mathbf{p}) + c\|\theta\|^2$
 $(\mathbf{p}, v) = f_\theta(s_t)$, $c$ 為 L2-regularization的常數
 
+
+# AlphaGo（"AG"） 和 AlphaGo Zero （"Zero"）的差別
+* AG 用兩個類神經網路，分別估計策略函數和價值函數。Zero 用一個多輸出的類神經網路。
+* Zero 的樹搜較單純，把傳統的 MCTS 的 expand 和 simulate 簡化了許多。
+    * 葉節點的子節點一律展開，不像原版有用一個 tree-policy 模型去判斷要展開哪些
+    * 當初 AG 有用類神經網路的評估去加強 MCTS 模擬出來的價值估計（兩個不同的價值估計做加權平均），而 Zero 是選擇捨棄模擬這步驟，用網路的評估完全代替模。
+* AG 的策略網路是先用棋譜和 supervised-learning 的方式做初始化。Zero 沒有這樣做。
 ---
 
 # 用策略迭代（Policy Iteration）的角度看 AlphaGo Zero
