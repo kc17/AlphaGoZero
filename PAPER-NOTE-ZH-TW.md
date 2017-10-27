@@ -42,26 +42,26 @@ by Alvin
 ----
 
 ### 步驟
-    * **選擇新節點**: 從根節點用開始走一條樹徑，直到你遇到新的節點（葉節點）。走路的方式就是在節點用某個規則選該走的邊，則『選新節點』這步等於：選邊，走到下一個節點，選邊，走到下一個節點 ... 遇到新的節點
-        * 走路時的『某個規則』為UCT (Upper Confidence Bound (UCB) for Trees)：
-            * 選動作（邊）$a = \mathrm{argmax}_a Q_{(s_t, a)} + U_{(s_t, a)}$
-                * Q 為邊上的一個統計值，是這邊底下的子樹的平均價值。各個邊的 Q 會在搜尋的過程中被跟新，初始化時是 0。
-                * U為所謂的「信賴上界」，代表我們對目前邊上Q值的信賴。
+* **選擇新節點**: 從根節點用開始走一條樹徑，直到你遇到新的節點（葉節點）。走路的方式就是在節點用某個規則選該走的邊，則『選新節點』這步等於：選邊，走到下一個節點，選邊，走到下一個節點 ... 遇到新的節點
+    * 走路時的『某個規則』為UCT (Upper Confidence Bound (UCB) for Trees)：
+        * 選動作（邊）$a = \mathrm{argmax}_a Q_{(s_t, a)} + U_{(s_t, a)}$
+            * Q 為邊上的一個統計值，是這邊底下的子樹的平均價值。各個邊的 Q 會在搜尋的過程中被跟新，初始化時是 0。
+            * U為所謂的「信賴上界」，代表我們對目前邊上Q值的信賴。
 $U_{(s, a)} = c_{puct} P_{(s, a)} \frac{\sqrt{\sum_b N_{(s, b)}} }{1 + N_{(s, a)}}$
 這裡N為這邊之前被選過幾次，及為走訪次數。走越多的邊信賴上線就越小。我們可以把U想成是一個各邊有的加分條件，讓比較沒走訪過得邊有加分條件，這樣比較容易被選到。
-    * **用類神經做評估**: 走到新的節點 $s_L$ 後就要拿給類神經網路做評估。類神經網路回傳的是這狀態的各個動作的動作機率以及這狀態 $\mathbf{p}$ 的價值估計$v$。
-        * **邊值初始化（樹的擴充）**: 用$\mathbf{p}$初始化 $s_L$ 所有的邊
-            * 假設 $A$ 為動作集合，為所有 $a\in A$ 製造一樹邊 ($s_L, a$) 並且初始化統計值 N, W, Q 和 P
-                * N=0: 走訪次數
-                * W=0: 此樹邊指向的子樹裡的價值合
-                * Q=0: W 除 N，子樹的平均價值 
-                * P=$p_a$ + [$\mathrm{Dir}$ if $s_L$ is root]: stored *prior probability* of taking action $a$ at state $s_L$
-                    * add Dirichlet loss to root node to encourage exploration
-        * **回祖先樹邊更新統計（反向傳播）**: 
-            * 用$v$更新根節點到$s_L$路徑中各邊 ($s_t$, $a_t$) 的統計值 
-                * $W_{(s_t, a_t)} = W_{(s_t, a_t)} + v$
-                * $N_{(s_t, a_t)} = N_{(s_t, a_t)} + 1$
-                * $Q_{(s_t, a_t)} = \frac{W_{(s_t, a_t})}{N_({s_t, a_t})}$
+* **用類神經做評估**: 走到新的節點 $s_L$ 後就要拿給類神經網路做評估。類神經網路回傳的是這狀態的各個動作的動作機率以及這狀態 $\mathbf{p}$ 的價值估計$v$。
+    * **邊值初始化（樹的擴充）**: 用$\mathbf{p}$初始化 $s_L$ 所有的邊
+        * 假設 $A$ 為動作集合，為所有 $a\in A$ 製造一樹邊 ($s_L, a$) 並且初始化統計值 N, W, Q 和 P
+            * N=0: 走訪次數
+            * W=0: 此樹邊指向的子樹裡的價值合
+            * Q=0: W 除 N，子樹的平均價值 
+            * P=$p_a$ + [$\mathrm{Dir}$ if $s_L$ is root]: stored *prior probability* of taking action $a$ at state $s_L$
+                * add Dirichlet loss to root node to encourage exploration
+    * **回祖先樹邊更新統計（反向傳播）**: 
+        * 用$v$更新根節點到$s_L$路徑中各邊 ($s_t$, $a_t$) 的統計值 
+            * $W_{(s_t, a_t)} = W_{(s_t, a_t)} + v$
+            * $N_{(s_t, a_t)} = N_{(s_t, a_t)} + 1$
+            * $Q_{(s_t, a_t)} = \frac{W_{(s_t, a_t})}{N_({s_t, a_t})}$
 
 ---
 
@@ -75,12 +75,12 @@ MCTS做到一定程度後（論文是固定1600個迴圈），就可以用算出
 
 ## 訓練類神經網路:
 類神經網路同時估計策略和價值函數
-    * 過去自己打自己的每一局的每一布可以當作一筆訓練資料 $(s_t, \pi_t, z_t)$
-        * $s_t$: 當時盤狀
-        * $\pi_t$: 當時MCTS後的動作機率值
-        * $z_t$: 1或-1，如果這步的玩家也是最後這局的贏家則1，否則 -1
-    * 抽幾筆 $(s_t, \pi_t, z_t)$ 當作一個訓練batch。類神經網路是同時估計策略和價值，策略的部份就是靠 $\pi_t$ 訓練，價值的部份就是靠 $z_t$ 訓練。
-        * Loss function: mean-squared error 和 cross-entropy loss 的合（論文是選擇平等加權）。
+* 過去自己打自己的每一局的每一布可以當作一筆訓練資料 $(s_t, \pi_t, z_t)$
+    * $s_t$: 當時盤狀
+    * $\pi_t$: 當時MCTS後的動作機率值
+    * $z_t$: 1或-1，如果這步的玩家也是最後這局的贏家則1，否則 -1
+* 抽幾筆 $(s_t, \pi_t, z_t)$ 當作一個訓練batch。類神經網路是同時估計策略和價值，策略的部份就是靠 $\pi_t$ 訓練，價值的部份就是靠 $z_t$ 訓練。
+    * Loss function: mean-squared error 和 cross-entropy loss 的合（論文是選擇平等加權）。
 For single example from time-step $t$, $(s_t , \pi_t , z_t )$, $\mathcal{L} = (z_t-v)^2 + (-\mathbf{\pi_t}^{\intercal}\mathrm{log}\mathbf{p}) + c\|\theta\|^2$
 $(\mathbf{p}, v) = f_\theta(s_t)$, $c$ 為 L2-regularization的常數
 
