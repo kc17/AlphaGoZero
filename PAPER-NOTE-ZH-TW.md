@@ -80,7 +80,7 @@ $U_{(s, a)} = c_{puct} P_{(s, a)} \frac{\sqrt{\sum_b N_{(s, b)}} }{1 + N_{(s, a)
     * 抽幾筆 $(s_t, \pi_t, z_t)$ 當作一個訓練batch。類神經網路是同時估計策略和價值，策略的部份就是靠 $\pi_t$ 訓練，價值的部份就是靠 $z_t$ 訓練。
         * Loss function: mean-squared error 和 cross-entropy loss 的合（論文是選擇平等加權）。
 For single example from time-step $t$, $(s_t , \pi_t , z_t )$, $\mathcal{L} = (z_t-v)^2 + (-\mathbf{\pi_t}^{\intercal}\mathrm{log}\mathbf{p}) + c\|\theta\|^2$
-$(\mathbf{p}, v) = f_\theta(s_t)$, $c$ 為 L2-reguglarization的常數
+$(\mathbf{p}, v) = f_\theta(s_t)$, $c$ 為 L2-regularization的常數
 
 ---
 
@@ -94,7 +94,7 @@ $(\mathbf{p}, v) = f_\theta(s_t)$, $c$ 為 L2-reguglarization的常數
 AlphaGo Zero 自己對自己的學習演算法可以視為一種近似策略迭代的演算法，這裡用MCTS的計算和類神經網路的學習來做一種間接的策略評估和策略改進。
 ![](https://i.imgur.com/yluUf60.png)
 
-## References
+## 參考及延伸閱讀
 * [DeepMind AlphaGo Zero 網誌](https://deepmind.com/blog/alphago-zero-learning-scratch/)
 "AlphaGo Zero: Learning from scratch"
 DeepMind Blog Post
@@ -110,3 +110,5 @@ Gelly, S. et al. *The Grand Challenge of Computer Go:
 Monte Carlo Tree Search and Extensions* Communications of the ACM. (2012)
 * [MCTS survey](https://www.researchgate.net/publication/235985858_A_Survey_of_Monte_Carlo_Tree_Search_Methods)
 Browne, C. et al. *A Survey of Monte Carlo Tree Search Methods* IEEE Transactions on Computational Intelligence and AI in Games. (2012)
+* [Policy Iteration 介紹](http://incompleteideas.net/sutton/book/ebook/node46.html)
+Sutton, R. et Barto, A. *Reinforcement Learning: An Introduction*
